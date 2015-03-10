@@ -23,13 +23,18 @@ public class Zombiekiller extends AbstractUAPIClient {
   private static final String PARAM_ID_LONG = "id";
   private static final String PARAM_QUERY_SHORT = "q";
   private static final String PARAM_QUERY_LONG = "query";
+  private static final String PARAM_KILL_SHORT = "k";
+  private static final String PARAM_KILL_LONG = "kill";
+
 
   private Integer id;
 
   private String query;
 
+  private boolean kill;
+
   private Set<Content> seenContent = new HashSet<>(100);
-  private Set<Content> result = new HashSet<>(10);
+  private Set<Version> result = new HashSet<>(10);
 
   @Override
   protected void fillInOptions(Options options) {
@@ -45,11 +50,12 @@ public class Zombiekiller extends AbstractUAPIClient {
 
   @Override
   protected String getUsage() {
-    return "cm zombiekiller -u <user> [other options] [--id <id> | --query <query>]";
+    return "cm zombiekiller -u <user> [other options] [--id <id> | --query <query>] [--kill]";
   }
 
   @Override
   protected boolean parseCommandLine(CommandLine commandLine) {
+    kill = commandLine.hasOption(PARAM_KILL_SHORT) || commandLine.hasOption(PARAM_KILL_LONG);
     query = commandLine.getOptionValue(PARAM_QUERY_SHORT);
     String id_ = commandLine.getOptionValue(PARAM_ID_SHORT);
 
@@ -97,7 +103,7 @@ public class Zombiekiller extends AbstractUAPIClient {
       }
     }
 
-    printResult();
+    finish();
   }
 
   public static void main(String[] args) {
@@ -113,19 +119,25 @@ public class Zombiekiller extends AbstractUAPIClient {
         if (referrer.isDeleted()) {
           find(referrer); //enter recursion
         } else {
-          if (!result.contains(referrer)) {
-            result.add(referrer);
+          if (!result.contains(referringVersion)) {
+            result.add(referringVersion);
           }
         }
       }
     }
   }
 
-  private void printResult() {
+  private void finish() {
     getOut().info("Zombie killer has looked at " + seenContent.size() + " deleted content items and found " +
             result.size() + " undeleted content items referring to it:");
-    for (Content content : result) {
-      getOut().info("- " + content.getId() + " (" + content.getType().getName() + " / " + content.getPath() + ")");
+    for (Version version : result) {
+      Content content = version.getContainingContent();
+      getOut().info("- " + content.getId() + " (" + content.getType().getName() + " / " + content.getPath() + ")"
+              + " references deleted content in Version " + version.getId());
+      if (kill) {
+        getOut().info("deleting version " + version.getId() + "...");
+        version.destroy();
+      }
     }
   }
 }
