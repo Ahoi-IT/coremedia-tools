@@ -1,0 +1,9 @@
+# Java main class to call:
+JAVA_MAIN_CLASS=de.ahoiit.cm.tools.zombiekiller.Zombiekiller
+
+# Debugger
+#JAVA_VM_ARGS="$JAVA_VM_ARGS -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
+
+# Logger configuration
+JAVA_VM_ARGS="$JAVA_VM_ARGS -Dlogback.configurationFile=file://localhost/$INSTALL_DIR${FS}properties${FS}corem${FS}zombie-killer-logback.xml"
+
