@@ -4,19 +4,27 @@
 
 ## Purpose
 
-This is a CoreMedia command line tool that allows you to kill Zombie content, i.e. undead content that cannot be deleted
-  by calling `bin/cm recyclebin`, because the content is still referenced by older versions of content which is not
-  deleted.
+This is a CoreMedia command line tool package.
 
-One reason to do so might be that you want to remove a *deprecated* ContentType, but still have some instances of it in
-your recyclebin and cannot be deleted, because they are still referenced. Before you can finally delete this
-ContentType, all instances of it have to be deleted!
+## Contents
 
-## Usage
+### Zombie-Killer
+The Zombie-Killer is a tool that allows you to kill Zombie content, i.e. undead content that cannot be deleted by
+  calling `bin/cm recyclebin`, because the content is still referenced by old versions of some content.
 
-cm zombiekiller -u <user> [other options] [--id <id> | --query <query>] [--kill]
+A reason for this might be that you want to remove a *deprecated* ContentType from your CMS, but still have some
+  instances of this type in your recycle bin, which cannot be deleted the normal way, because they are still referenced.
 
-## Examples
+Before you can finally delete this ContentType, all of its instances have to be deleted! And the zombie-killer can help
+  you to achieve this.
+
+Other tools to follow...
+
+#### Usage
+
+`cm zombie-killer -u <user> [other options] [--id <id> | --query <query>] [--kill]`
+
+#### Examples
 
 * find, but do not kill versions that reference content with id 42:
 `cm-tools/bin/cm zombie-killer -u admin -p admin -url http://localhost:41080/coremedia/ior --id 42`

@@ -55,7 +55,7 @@ public class Zombiekiller extends AbstractUAPIClient {
 
   @Override
   protected String getUsage() {
-    return "cm zombiekiller -u <user> [other options] [--id <id> | --query <query>] [--kill]";
+    return "cm zombie-killer -u <user> [other options] [--id <id> | --query <query>] [--kill]";
   }
 
   @Override
