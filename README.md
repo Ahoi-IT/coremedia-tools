@@ -2,6 +2,8 @@
 
 (c) Alexander Lenzen, Ahoi-IT. mailto-name: al, mailto-domain: ahoi-it.de
 
+See `LICENSE.md` for licensing information.
+
 ## Purpose
 
 This is a CoreMedia command line tool package.
@@ -34,6 +36,11 @@ Other tools to follow...
 
 * find, **and** kill versions that reference content with type "OldType":
 `cm-tools/bin/cm zombie-killer -u admin -p admin -url http://localhost:41080/coremedia/ior --query "TYPE = OldType AND isDeleted" --kill`
+
+* find, **and** kill versions that content in the recycle bin:
+`cm-tools/bin/cm zombie-killer -u admin -p admin -url http://localhost:41080/coremedia/ior --query "isDeleted" --kill` -
+this might be followed by a complete cleanup of the recycle bin:
+`cm7-cms-tools/bin/cm cleanrecyclebin --noexport -u admin -p admin --before 20421231235959000 --after 20000101000000000`
 
 
 ## References
