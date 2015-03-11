@@ -6,13 +6,14 @@ package de.ahoiit.cm.tools.zombiekiller;
 
 import com.coremedia.cap.content.Content;
 import com.coremedia.cap.content.Version;
-import com.coremedia.cap.content.query.MalformedQueryException;
 import com.coremedia.cmdline.AbstractUAPIClient;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <p>TODO Document!</p>
@@ -46,6 +47,10 @@ public class Zombiekiller extends AbstractUAPIClient {
             .withDescription("ID of the zombie element. Either provide query or id!")
             .withLongOpt(PARAM_ID_LONG)
             .create(PARAM_ID_SHORT));
+    options.addOption(OptionBuilder
+            .withDescription("do not just find zombies, but kill the referencing versions if possible")
+            .withLongOpt(PARAM_KILL_LONG)
+            .create(PARAM_KILL_SHORT));
   }
 
   @Override
@@ -64,15 +69,6 @@ public class Zombiekiller extends AbstractUAPIClient {
         id = Integer.valueOf(id_);
       } catch (NumberFormatException e) {
         getOut().error("id " + id_ + " is not a number");
-        return false;
-      }
-    }
-
-    if (query != null) {
-      try {
-        getContentRepository().getQueryService().checkQuery(query);
-      } catch (MalformedQueryException e) {
-        getOut().error("malformed query");
         return false;
       }
     }
@@ -96,6 +92,8 @@ public class Zombiekiller extends AbstractUAPIClient {
       final Content content = getContentRepository().getContent(String.valueOf(id));
       find(content);
     } else {
+      getContentRepository().getQueryService().checkQuery(query);
+
       final Collection<Content> contents;
       contents = this.getContentRepository().getQueryService().poseContentQuery(query);
       for (Content content : contents) {
