@@ -18,6 +18,7 @@ import java.util.Set;
 /**
  * <p>TODO Document!</p>
  */
+@SuppressWarnings("deprecation")
 public class Zombiekiller extends AbstractUAPIClient {
 
   private static final String PARAM_ID_SHORT = "i";
@@ -35,9 +36,11 @@ public class Zombiekiller extends AbstractUAPIClient {
   private boolean kill;
 
   private Set<Content> seenContent = new HashSet<>(100);
-  private Set<Version> result = new HashSet<>(10);
+  private Set<Version> versionsToBeKilled = new HashSet<>(10);
+  private Set<Content> contentToBeDeleted = new HashSet<>(10);
 
   @Override
+  @SuppressWarnings("static-access")
   protected void fillInOptions(Options options) {
     options.addOption(OptionBuilder.hasArg()
             .withDescription("Query to be executed. Either provide query or id!")
@@ -117,8 +120,17 @@ public class Zombiekiller extends AbstractUAPIClient {
         if (referrer.isDeleted()) {
           find(referrer); //enter recursion
         } else {
-          if (!result.contains(referringVersion)) {
-            result.add(referringVersion);
+          if (referrer.getVersions().size() == 1) {
+            if (!contentToBeDeleted.contains(referrer)) {
+              getOut().warn("version " + referringVersion.getId() + " is only version of its content. " +
+                      "Will have to delete content instead of kill version. " +
+                      "You may need to run the tool again.");
+              contentToBeDeleted.add(referrer);
+            }
+          } else {
+            if (!versionsToBeKilled.contains(referringVersion)) {
+              versionsToBeKilled.add(referringVersion);
+            }
           }
         }
       }
@@ -127,15 +139,26 @@ public class Zombiekiller extends AbstractUAPIClient {
 
   private void finish() {
     getOut().info("Zombie killer has looked at " + seenContent.size() + " deleted content items and found " +
-            result.size() + " undeleted content items referring to it:");
-    for (Version version : result) {
+            versionsToBeKilled.size() + " versions" +
+            ((contentToBeDeleted.isEmpty()) ? "" : " and " + contentToBeDeleted.size() + " contents") + '.');
+    for (Content content : contentToBeDeleted) {
+      getOut().info(debugContent(content) + " references deleted content");
+      if (kill) {
+        getOut().info("deleting content " + content.getId() + "...");
+        content.delete();
+      }
+    }
+    for (Version version : versionsToBeKilled) {
       Content content = version.getContainingContent();
-      getOut().info("- " + content.getId() + " (" + content.getType().getName() + " / " + content.getPath() + ")"
-              + " references deleted content in Version " + version.getId());
+      getOut().info(debugContent(content) + " references deleted content in Version " + version.getId());
       if (kill) {
         getOut().info("deleting version " + version.getId() + "...");
         version.destroy();
       }
     }
+  }
+
+  private String debugContent(Content content) {
+    return "Content \"" + content.getPath() + "\" (TYPE: " + content.getType().getName() + "; ID: " + content.getId() + ")";
   }
 }
