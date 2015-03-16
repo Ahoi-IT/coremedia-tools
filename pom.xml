@@ -11,8 +11,8 @@
   <packaging>pom</packaging>
 
   <properties>
-    <spring.version>3.1.2.RELEASE</spring.version>
-    <coremedia.version>7.0.30-97</coremedia.version>
+    <spring.version>3.2.0.RELEASE</spring.version>
+    <coremedia.version>7.1.6-13</coremedia.version>
     <application-plugin.version>2.7.9</application-plugin.version>
     <compile.source.jdk>1.7</compile.source.jdk>
     <compile.target.jdk>1.7</compile.target.jdk>
